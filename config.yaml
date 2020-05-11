@@ -1,0 +1,12 @@
+# Server config
+server:
+  host: 127.0.0.1
+  port: 8080
+  timeout:
+    server: 30
+    read: 15
+    write: 10
+    idle: 5
+api:
+  url: https://api.themoviedb.org/3/
+  key: 5e6e3a42204730a67871f51dc2d326c4
