@@ -8,6 +8,15 @@ import (
 	"github.com/dgreat91/rm_movieapi_task/configuration"
 )
 
+//title, description, filename and its original link
+type movieObjects struct {
+	ID          int
+	Title       string
+	Description string
+	Filename    string
+	PosterURL   string
+}
+
 //Handle request /ping by responding with pong
 func ping(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("pong"))
