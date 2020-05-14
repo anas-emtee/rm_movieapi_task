@@ -1,6 +1,3 @@
-// Writing files in Go follows similar patterns to the
-// ones we saw earlier for reading.
-
 package dbsave
 
 import (
@@ -40,8 +37,7 @@ func SaveDataDb(s string) {
 
 	var movs []MovieObjects
 	jsonErr := json.Unmarshal([]byte(s), &movs)
-	/**people1 := people{}
-	  jsonErr := json.Unmarshal(body, &people1)*/
+
 	if jsonErr != nil {
 		log.Fatal(jsonErr)
 	}
