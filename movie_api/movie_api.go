@@ -10,30 +10,22 @@ import (
 	"time"
 
 	"github.com/dgreat91/rm_movieapi_task/configuration"
+	"github.com/dgreat91/rm_movieapi_task/dbsave"
 	"github.com/dgreat91/rm_movieapi_task/fileread"
-	"github.com/dgreat91/rm_movieapi_task/filesave"
 )
 
-//title, description, filename and its original link
+//Base is the original structure of MOVIEDB JSON
 type Base struct {
 	Page         int `json:"page"`
 	TotalResults int `json:"total_results"`
 	TotalPages   int `json:"total_pages"`
 	Results      []struct {
-		ID    int    `json:"id"`
-		Title string `json:"title"`
-		//Description   string
+		ID            int    `json:"id"`
+		Title         string `json:"title"`
+		Description   string `json:"overview"`
 		OriginalTitle string `json:"original_title"`
 		PosterPath    string `json:"poster_path"`
 	}
-}
-
-type movieObjects struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-	//Description   string
-	OriginalTitle string `json:"original_title"`
-	PosterPath    string `json:"poster_path"`
 }
 
 //Handle request /ping by responding with pong
@@ -49,19 +41,6 @@ func fetch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	apiKey := apiCfg.API.Key
-	/*clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27017")
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Connected to MongoDB!")*/
-	//https://api.themoviedb.org/3/discover/movie?api_key="+api_key+"&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1
 	url := "https://api.themoviedb.org/3/discover/movie?api_key=" + apiKey + "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
 
 	spaceClient := http.Client{
@@ -95,8 +74,6 @@ func fetch(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("%+v\n", b)
 	fmt.Println(b.Results[0].ID)
 
-	//var m
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -110,15 +87,14 @@ func fetch(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(jsonErr)
 	}
 	sb := string(movieJSON)
-	filesave.SaveData(sb)
+	//filesave.SaveData(sb)
+	dbsave.SaveDataDb(sb)
 }
 
 func showData(w http.ResponseWriter, r *http.Request) {
 	data := fileread.ReadData()
 
 	imgbody, jsonErr := json.Marshal(data)
-	/**people1 := people{}
-	jsonErr := json.Unmarshal(body, &people1)*/
 	if jsonErr != nil {
 		log.Fatal(jsonErr)
 	}
