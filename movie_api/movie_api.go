@@ -94,12 +94,6 @@ func fetch(w http.ResponseWriter, r *http.Request) {
 }
 
 func allMovies(w http.ResponseWriter, r *http.Request) {
-	/*data := fileread.ReadData()
-
-	imgbody, jsonErr := json.Marshal(data)
-	if jsonErr != nil {
-		log.Fatal(jsonErr)
-	}*/
 	imgbody := dbread.GetAllMovies()
 
 	dst := &bytes.Buffer{}
