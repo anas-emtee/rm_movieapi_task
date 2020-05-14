@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dgreat91/rm_movieapi_task/configuration"
+	"github.com/dgreat91/rm_movieapi_task/dbread"
 	"github.com/dgreat91/rm_movieapi_task/dbsave"
-	"github.com/dgreat91/rm_movieapi_task/fileread"
 )
 
 //Base is the original structure of MOVIEDB JSON
@@ -91,13 +93,14 @@ func fetch(w http.ResponseWriter, r *http.Request) {
 	dbsave.SaveDataDb(sb)
 }
 
-func showData(w http.ResponseWriter, r *http.Request) {
-	data := fileread.ReadData()
+func allMovies(w http.ResponseWriter, r *http.Request) {
+	/*data := fileread.ReadData()
 
 	imgbody, jsonErr := json.Marshal(data)
 	if jsonErr != nil {
 		log.Fatal(jsonErr)
-	}
+	}*/
+	imgbody := dbread.GetAllMovies()
 
 	dst := &bytes.Buffer{}
 	if err := json.Indent(dst, imgbody, "", "  "); err != nil {
@@ -114,6 +117,27 @@ func showData(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte(sbody))
 }
+
+func findMovie(w http.ResponseWriter, r *http.Request) {
+	message := r.URL.Path
+	message = strings.TrimPrefix(message, "/movie/")
+
+	i1, err := strconv.Atoi(message)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	imgbody := dbread.FindMovie(i1)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+	w.Write([]byte(imgbody))
+}
+
 func main() {
 	cfg, err := configuration.NewConfig()
 	if err != nil {
@@ -124,7 +148,8 @@ func main() {
 	//Request Handler For Request /ping
 	http.HandleFunc("/ping", ping)
 	http.HandleFunc("/fetch", fetch)
-	http.HandleFunc("/movies", showData)
+	http.HandleFunc("/movies", allMovies)
+	http.HandleFunc("/movie/", findMovie)
 
 	//Start Web Server
 	if err := http.ListenAndServe(cfg.Server.Host+":"+cfg.Server.Port, nil); err != nil {
