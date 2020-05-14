@@ -13,3 +13,14 @@ Revenue Master Movie API Task
 * Handle the json query request from a user to query photo name, description, filename and its orginal link from your data storage.
 
 * Take your time, it’s not a race. Just don’t make us wait too long :) Typcially candidates return their task within two weeks.
+
+## SETUP ##
+
+* Mongodb Used as Database
+    *  Database Name: rm_moviedb
+    *  Collection Name: movies
+
+* Config File Used For Server and API Parameters
+
+* config.yaml should be available in current running directory
+
