@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dgreat91/rm_movieapi_task/configuration"
+	"github.com/dgreat91/rm_movieapi_task/filesave"
 )
 
 //title, description, filename and its original link
@@ -101,6 +102,13 @@ func fetch(w http.ResponseWriter, r *http.Request) {
 		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 
 	w.Write([]byte(body))
+
+	movieJSON, jsonErr := json.Marshal(b.Results)
+	if jsonErr != nil {
+		log.Fatal(jsonErr)
+	}
+	sb := string(movieJSON)
+	filesave.SaveData(sb)
 }
 func main() {
 	cfg, err := configuration.NewConfig()
