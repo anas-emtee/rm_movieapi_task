@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dgreat91/rm_movieapi_task/configuration"
+	"github.com/dgreat91/rm_movieapi_task/fileread"
 	"github.com/dgreat91/rm_movieapi_task/filesave"
 )
 
@@ -110,6 +112,32 @@ func fetch(w http.ResponseWriter, r *http.Request) {
 	sb := string(movieJSON)
 	filesave.SaveData(sb)
 }
+
+func showData(w http.ResponseWriter, r *http.Request) {
+	data := fileread.ReadData()
+
+	imgbody, jsonErr := json.Marshal(data)
+	/**people1 := people{}
+	jsonErr := json.Unmarshal(body, &people1)*/
+	if jsonErr != nil {
+		log.Fatal(jsonErr)
+	}
+
+	dst := &bytes.Buffer{}
+	if err := json.Indent(dst, imgbody, "", "  "); err != nil {
+		panic(err)
+	}
+
+	sbody := dst.String()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+	w.Write([]byte(sbody))
+}
 func main() {
 	cfg, err := configuration.NewConfig()
 	if err != nil {
@@ -120,6 +148,7 @@ func main() {
 	//Request Handler For Request /ping
 	http.HandleFunc("/ping", ping)
 	http.HandleFunc("/fetch", fetch)
+	http.HandleFunc("/movies", showData)
 
 	//Start Web Server
 	if err := http.ListenAndServe(cfg.Server.Host+":"+cfg.Server.Port, nil); err != nil {
